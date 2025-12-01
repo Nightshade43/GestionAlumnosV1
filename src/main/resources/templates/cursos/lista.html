@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Cursos</title>
+</head>
+<body>
+<h1>Cursos Registrados</h1>
+<a th:href="@{/ui/cursos/crear}">Crear Nuevo Curso</a>
+
+<hr>
+
+<div th:if="${success}" style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 10px;">
+    <p th:text="${success}"></p>
+</div>
+<div th:if="${error}" style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 10px;">
+    <p th:text="${error}"></p>
+</div>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre Completo</th>
+        <th>Materia</th>
+        <th>Año y División</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="curso : ${cursos}">
+        <td th:text="${curso.id}">1</td>
+        <td th:text="${curso.nombreCompleto}">Informática I - 1º A</td>
+        <td th:text="${curso.nombreMateria}">Informática I</td>
+        <td th:text="${curso.anio} + 'º ' + ${curso.division}">1º A</td>
+        <td>
+            <a th:href="@{'/ui/cursos/' + ${curso.id} + '/detalles'}">Ver Detalles</a>
+
+            |
+
+            <form th:action="@{'/ui/cursos/eliminar/' + ${curso.id}}" method="post" style="display: inline;">
+                <button type="submit" onclick="return confirm('¿ELIMINAR CURSO? Esto eliminará todos los núcleos y notas.')" style="color: red; cursor: pointer;">
+                    Eliminar
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+    <tbody th:if="${#lists.isEmpty(cursos)}">
+    <tr><td colspan="5">No hay cursos registrados.</td></tr>
+    </tbody>
+</table>
+</body>
+</html>

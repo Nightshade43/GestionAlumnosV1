@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <h1 th:text="'Curso: ' + ${curso.nombreCompleto}">Detalles del Curso</h1>
+    <a th:href="@{/ui/cursos}">Volver a Cursos</a> |
+    <a th:href="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}">Añadir Núcleo Pedagógico</a> |
+    <a th:href="@{'/ui/cursos/' + ${curso.id} + '/inscribir'}">Inscribir Alumno</a>
+</head>
+<body>
+<h1 th:text="'Curso: ' + ${curso.nombreCompleto}">Detalles del Curso</h1>
+<a th:href="@{/ui/cursos}">Volver a Cursos</a> |
+<a th:href="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}">Añadir Núcleo Pedagógico</a>
+
+<h2>Información del Curso</h2>
+<ul>
+    <li th:text="'Materia: ' + ${curso.nombreMateria}"></li>
+    <li th:text="'Año y División: ' + ${curso.anio} + 'º ' + ${curso.division}"></li>
+    <li th:text="'ID: ' + ${curso.id}"></li>
+</ul>
+
+<hr>
+
+<h2>Alumnos Inscritos (<span th:text="${#lists.size(curso.alumnos)}">0</span>)</h2>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="alumno : ${curso.alumnos}">
+        <td th:text="${alumno.id}"></td>
+        <td th:text="${alumno.nombre} + ' ' + ${alumno.apellido}"></td>
+        <td th:text="${alumno.email}"></td>
+    </tr>
+    </tbody>
+    <tbody th:if="${#lists.isEmpty(curso.alumnos)}">
+    <tr><td colspan="3">No hay alumnos inscritos en este curso.</td></tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>Núcleos Pedagógicos</h2>
+
+<div th:if="${#lists.isEmpty(curso.nucleos)}">
+    <p>Aún no se han definido núcleos pedagógicos para este curso.</p>
+</div>
+
+<div th:each="nucleo : ${curso.nucleos}" style="border: 1px solid #ccc; margin-bottom: 20px; padding: 15px;">
+    <h3 th:text="${nucleo.tema}">Tema del Núcleo</h3>
+    <p th:text="${nucleo.descripcion}">Descripción.</p>
+
+    <h4>Notas Registradas (<span th:text="${#lists.size(nucleo.notas)}">0</span>)</h4>
+
+    <table border="1" style="width: 100%;">
+        <thead>
+        <tr>
+            <th>Valor</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="nota : ${nucleo.notas}">
+            <td th:text="${nota.valor}">9</td>
+            <td th:text="${nota.descripcion}"></td>
+            <td><a href="#">Eliminar</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4>Añadir Nueva Nota</h4>
+    <form th:action="@{/ui/notas/guardar}" th:object="${nuevaNota}" method="post">
+
+        <input type="hidden" name="nucleoId" th:value="${nucleo.id}">
+
+        <input type="hidden" name="cursoId" th:value="${curso.id}">
+
+        <input type="number" th:field="*{valor}" placeholder="Nota (1-10)" min="1" max="10" required style="width: 150px;">
+        <input type="text" th:field="*{descripcion}" placeholder="Descripción de la evaluación">
+        <button type="submit">Guardar Nota</button>
+    </form>
+
+    <p>
+        Promedio del Núcleo:
+        <strong th:if="${promedios.get(nucleo.id) > 0}"
+                th:text="${#numbers.formatDecimal(promedios.get(nucleo.id), 1, 2)}">
+            [X.XX]
+        </strong>
+        <span th:if="${promedios.get(nucleo.id) == 0.0}">
+            (Sin notas)
+        </span>
+    </p>
+</div>
+</body>
+</html>

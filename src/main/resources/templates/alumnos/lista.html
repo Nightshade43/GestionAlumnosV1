@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Alumnos</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Lista de Alumnos Registrados</h1>
+<a th:href="@{/ui/alumnos/crear}">Crear Nuevo Alumno</a>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre Completo</th>
+        <th>Email</th>
+        <th>Cursos Inscritos</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="alumno : ${alumnos}">
+        <td th:text="${alumno.id}">A-1234</td>
+        <td th:text="${alumno.nombre} + ' ' + ${alumno.apellido}">Juan Pérez</td>
+        <td th:text="${alumno.email}">jperez@mail.com</td>
+        <td>
+                    <span th:each="curso, iter : ${alumno.cursos}">
+                        <span th:text="${curso.nombreCompleto}">Informática I - 1º A</span>
+                        <span th:if="${!iter.last}">, </span>
+                    </span>
+        <td>
+            <a th:href="@{'/ui/alumnos/' + ${alumno.id} + '/editar'}">Editar</a> |
+            <form th:action="@{'/ui/alumnos/eliminar/' + ${alumno.id}}" method="post" style="display: inline;">
+                <button type="submit" onclick="return confirm('¿Eliminar alumno? Esto lo desinscribirá de todos los cursos.')" style="color: red;">
+                    Eliminar
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

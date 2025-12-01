@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="'Inscribir Alumno a: ' + ${curso.nombreCompleto}">Inscripción</title>
+</head>
+<body>
+<h1 th:text="'Inscribir Alumno a: ' + ${curso.nombreCompleto}">Inscripción</h1>
+<a th:href="@{'/ui/cursos/' + ${curso.id} + '/detalles'}">Volver a Detalles</a>
+
+<h2>Seleccionar Alumno</h2>
+
+<form th:action="@{'/ui/cursos/' + ${curso.id} + '/inscribir'}" method="post">
+
+  <div>
+    <label for="alumnoId">Alumno:</label>
+    <select id="alumnoId" name="alumnoId" required>
+      <option value="">-- Seleccione un alumno --</option>
+      <option th:each="alumno : ${alumnosDisponibles}"
+              th:value="${alumno.id}"
+              th:text="${alumno.nombre} + ' ' + ${alumno.apellido} + ' (' + ${alumno.id} + ')'">
+        Alumno Nombre (ID)
+      </option>
+    </select>
+  </div>
+
+  <div th:if="${#lists.isEmpty(alumnosDisponibles)}">
+    <p style="color: blue;">Todos los alumnos están ya inscritos en este curso.</p>
+  </div>
+
+  <button type="submit" th:if="${!#lists.isEmpty(alumnosDisponibles)}">Inscribir</button>
+</form>
+</body>
+</html>

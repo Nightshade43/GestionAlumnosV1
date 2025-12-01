@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Crear Nuevo Curso</title>
+</head>
+<body>
+<h1>Crear Nuevo Curso</h1>
+<a th:href="@{/ui/cursos}">Volver a la Lista de Cursos</a>
+
+<p th:if="${error}" style="color: red;" th:text="${error}">[Mensaje de error]</p>
+
+<form th:action="@{/ui/cursos}" th:object="${curso}" method="post">
+
+  <div>
+    <label for="nombreMateria">Nombre de la Materia:</label>
+    <input type="text" id="nombreMateria" th:field="*{nombreMateria}" required>
+  </div>
+
+  <div>
+    <label for="anio">Año de Cursada (Ej: 1):</label>
+    <input type="number" id="anio" th:field="*{anio}" required min="1">
+  </div>
+
+  <div>
+    <label for="division">División (Ej: 'A', 'B'):</label>
+    <input type="text" id="division" th:field="*{division}" required>
+  </div>
+
+  <button type="submit">Guardar Curso</button>
+
+</form>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Nuevo Alumno</title>
+</head>
+<body>
+<h1>Crear Nuevo Alumno</h1>
+<a th:href="@{/ui/alumnos}">Volver a la Lista</a>
+
+<p th:if="${error}" style="color: red;" th:text="${error}">[Mensaje de error]</p>
+
+<form th:action="@{/ui/alumnos}" th:object="${alumno}" method="post">
+
+    <div>
+        <label for="id">ID Único (Obligatorio):</label>
+        <input type="text" id="id" th:field="*{id}" required>
+    </div>
+
+    <div>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" th:field="*{nombre}" required>
+    </div>
+
+    <div>
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" th:field="*{apellido}" required>
+    </div>
+
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" th:field="*{email}">
+    </div>
+
+    <button type="submit">Guardar Alumno</button>
+
+</form>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Añadir Núcleo Pedagógico</title>
+</head>
+<body>
+<h1 th:text="'Añadir Núcleo a: ' + ${curso.nombreCompleto}">Añadir Núcleo a Curso</h1>
+<a th:href="@{/ui/cursos}">Volver a la Lista de Cursos</a>
+
+<p th:if="${error}" style="color: red;" th:text="${error}">[Mensaje de error]</p>
+
+<form th:action="@{'/ui/cursos/' + ${curso.id} + '/nucleos'}" th:object="${nucleo}" method="post">
+
+    <div>
+        <label for="tema">Tema Principal (Obligatorio):</label>
+        <input type="text" id="tema" th:field="*{tema}" required>
+    </div>
+
+    <div>
+        <label for="descripcion">Descripción / Contenidos:</label>
+        <textarea id="descripcion" th:field="*{descripcion}" rows="5"></textarea>
+    </div>
+
+    <button type="submit">Guardar Núcleo Pedagógico</button>
+
+</form>
+</body>
+</html>
