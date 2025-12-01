@@ -27,8 +27,8 @@ public class Curso {
     // Relación Uno a Muchos: Un curso tiene muchos núcleos pedagógicos.
     @OneToMany(
             mappedBy = "curso",
-            cascade = CascadeType.ALL, // <--- ESTO ES CRÍTICO
-            orphanRemoval = true      // <--- También es recomendable
+            cascade = CascadeType.ALL, // <--- Esto permite guardar el padre y al hijo
+            orphanRemoval = true
     )
     private List<NucleoPedagogico> nucleos;
 
@@ -41,8 +41,6 @@ public class Curso {
             nucleos = new java.util.ArrayList<>();
         }
         nucleos.add(nucleo);
-
-        // ESTA LÍNEA ES CRÍTICA: Establece el enlace de vuelta
-        nucleo.setCurso(this);
+        nucleo.setCurso(this); // Bidireccionalidad
     }
 }

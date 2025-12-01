@@ -57,23 +57,20 @@ public class NucleoPedagogicoService {
         nucleoRepository.deleteById(id);
     }
 
-    @Transactional // <-- Importante: Debe ser transaccional
-    public void crearNucleo(Long cursoId, NucleoPedagogico nuevoNucleo) {
-        // 1. Encontrar el Curso.
+    // ¡CRÍTICO! Esto mantiene la sesión de Hibernate activa y gestiona las entidades
+    @Transactional
+    public Curso crearNucleo(Long cursoId, NucleoPedagogico nuevoNucleo) {
+
+        // 1. Encontrar el Curso. (Este objeto está AHORA ATTACHED a la sesión)
         Curso curso = cursoRepository.findById(cursoId)
                 .orElseThrow(() -> new NoSuchElementException("Curso no encontrado con ID: " + cursoId));
 
-        // 2. Usar el método helper (definido arriba) para establecer la relación bidireccional.
+        // 2. Establecer la bidireccionalidad (Corrección anterior)
         curso.addNucleo(nuevoNucleo);
+        // Recuerda que curso.addNucleo(nuevoNucleo) debe llamar a nuevoNucleo.setCurso(this);
 
-        // NOTA: Con CascadeType.ALL en Curso.nucleos, guardar el Curso debería
-        // guardar automáticamente el nuevo Nucleo.
-
-        // 3. Persistir el cambio en el padre (Curso).
-        // Esto fuerza la actualización de la lista de núcleos y guarda el nuevo núcleo.
-        cursoRepository.save(curso);
-
-        // Anteriormente, quizás solo estabas haciendo nucleoRepository.save(nuevoNucleo);
-        // pero si el Curso no se actualiza explícitamente, puede causar el error StaleObjectException.
+        // 3. Persistir el Curso. Esto automáticamente guarda el nuevo Nucleo
+        // gracias a CascadeType.ALL.
+        return cursoRepository.save(curso);
     }
 }

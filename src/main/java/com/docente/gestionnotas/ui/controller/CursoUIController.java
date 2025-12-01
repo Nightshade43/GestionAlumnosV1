@@ -99,8 +99,15 @@ public class CursoUIController {
             }
 
             // 2. Añadir ambos objetos al modelo
-            model.addAttribute("curso", curso);
+            // 2. Proporcionar el objeto para la creación de Notas (Si el formulario existe en detalles.html)
+            // Asumimos que la nota usa 'nuevaNota' como nombre.
             model.addAttribute("nuevaNota", new Nota());
+
+            // 3. ¡EL OBJETO 'nucleo' FALTANTE! (CAUSA DEL ERROR)
+            // Esto es inusual, pero tu plantilla lo pide.
+            // Esto es necesario si tienes un formulario para crear *otro* nucleo
+            // en la misma página, o si el formulario de notas tiene un error en el th:object.
+            model.addAttribute("nucleo", new NucleoPedagogico()); //
             model.addAttribute("promedios", promediosNucleo); // <-- NUEVO: Mapa de promedios
 
             return "cursos/detalles";

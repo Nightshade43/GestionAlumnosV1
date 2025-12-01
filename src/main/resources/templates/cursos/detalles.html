@@ -6,10 +6,6 @@
     <a th:href="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}">Añadir Núcleo Pedagógico</a> |
     <a th:href="@{'/ui/cursos/' + ${curso.id} + '/inscribir'}">Inscribir Alumno</a>
 </head>
-<body>
-<h1 th:text="'Curso: ' + ${curso.nombreCompleto}">Detalles del Curso</h1>
-<a th:href="@{/ui/cursos}">Volver a Cursos</a> |
-<a th:href="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}">Añadir Núcleo Pedagógico</a>
 
 <h2>Información del Curso</h2>
 <ul>
