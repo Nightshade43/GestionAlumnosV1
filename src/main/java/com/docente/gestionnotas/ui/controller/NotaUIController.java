@@ -54,37 +54,23 @@ public class NotaUIController {
         }
     }
 
-    // NUEVO MÉTODO: POST para eliminar una Nota
-    @PostMapping("/eliminar-nota")
-    public String eliminarNota(@RequestParam Long notaId,
-                               @RequestParam Long cursoId,
-                               RedirectAttributes redirectAttributes) {
-
-        String redirectUrl = "redirect:/ui/cursos/" + cursoId + "/detalles";
-
-        try {
-            notaService.deleteById(notaId);
-            redirectAttributes.addFlashAttribute("success", "Nota eliminada exitosamente.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al eliminar la nota.");
-        }
-        return redirectUrl;
+    // Controlador para ELIMINAR NÚCLEO
+    @PostMapping("/nucleos/eliminar/{nucleoId}")
+    public String eliminarNucleo(
+            @PathVariable Long nucleoId,
+            @RequestParam Long cursoId, // Captura el campo oculto
+            RedirectAttributes redirectAttributes) {
+        // ... lógica de eliminación con nucleoService.deleteById(nucleoId) ...
+        return "redirect:/ui/cursos/" + cursoId + "/detalles";
     }
 
-    // NUEVO MÉTODO: POST para eliminar un Núcleo
-    @PostMapping("/eliminar-nucleo")
-    public String eliminarNucleo(@RequestParam Long nucleoId,
-                                 @RequestParam Long cursoId,
-                                 RedirectAttributes redirectAttributes) {
-
-        String redirectUrl = "redirect:/ui/cursos/" + cursoId + "/detalles";
-
-        try {
-            nucleoService.deleteById(nucleoId);
-            redirectAttributes.addFlashAttribute("success", "Núcleo pedagógico eliminado exitosamente.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al eliminar el núcleo. Detalle: " + e.getMessage());
-        }
-        return redirectUrl;
+    // Controlador para ELIMINAR NOTA
+    @PostMapping("/notas/eliminar/{notaId}")
+    public String eliminarNota(
+            @PathVariable Long notaId,
+            @RequestParam Long cursoId, // Captura el campo oculto
+            RedirectAttributes redirectAttributes) {
+        // ... lógica de eliminación con notaService.deleteById(notaId) ...
+        return "redirect:/ui/cursos/" + cursoId + "/detalles";
     }
 }

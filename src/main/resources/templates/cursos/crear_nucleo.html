@@ -10,7 +10,7 @@
 
 <p th:if="${error}" style="color: red;" th:text="${error}">[Mensaje de error]</p>
 
-<form th:action="@{'/ui/cursos/' + ${curso.id} + '/nucleos'}" th:object="${nucleo}" method="post">
+<form th:action="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}" th:object="${nucleo}" method="post">
 
     <div>
         <label for="tema">Tema Principal (Obligatorio):</label>

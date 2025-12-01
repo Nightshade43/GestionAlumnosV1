@@ -46,7 +46,7 @@ public class NotaService {
         // Nota: Si el NucleoPedagogico ya tiene un CASCADE.ALL con Curso,
         // y Nota tiene un CASCADE.ALL con Nucleo, esto podría ser redundante,
         // pero asegura que la referencia sea persistida si no hay un CASCADE completo.
-        return nucleoService.nucleoRepository.save(nucleo);
+        return nucleoService.save(nucleo);
     }
 
     @Transactional

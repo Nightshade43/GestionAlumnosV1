@@ -22,6 +22,10 @@ public class NucleoPedagogicoService {
         this.cursoRepository = cursoRepository;
     }
 
+    public NucleoPedagogico save(NucleoPedagogico nucleo) {
+        return nucleoRepository.save(nucleo);
+    }
+
     @Transactional(readOnly = true)
     public NucleoPedagogico findById(Long id) {
         return nucleoRepository.findById(id)
@@ -52,9 +56,10 @@ public class NucleoPedagogicoService {
     }
 
     @Transactional
-    public void deleteById(Long id) {
-        // La eliminación de un núcleo debería propagarse (CASCADE) a sus notas.
-        nucleoRepository.deleteById(id);
+    public void deleteById(Long nucleoId) {
+        // Si usas CascadeType.ALL en tu entidad NucleoPedagogico para las notas,
+        // al eliminar el núcleo, las notas asociadas también se eliminarán automáticamente.
+        nucleoRepository.deleteById(nucleoId);
     }
 
     // ¡CRÍTICO! Esto mantiene la sesión de Hibernate activa y gestiona las entidades
