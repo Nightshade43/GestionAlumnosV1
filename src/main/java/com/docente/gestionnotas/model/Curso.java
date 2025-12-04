@@ -1,9 +1,8 @@
 package com.docente.gestionnotas.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
+
 import java.util.List;
 
 @Entity
@@ -17,9 +16,13 @@ public class Curso {
     private Long id;
 
     // Ejemplo: "Informática I - 1º A"
+    @Getter
+    @Setter
     @Column(unique = true, nullable = false)
     private String nombreCompleto;
 
+    @Getter
+    @Setter
     private String nombreMateria;
     private int anio;
     private String division;
@@ -43,4 +46,5 @@ public class Curso {
         nucleos.add(nucleo);
         nucleo.setCurso(this); // Bidireccionalidad
     }
+
 }
