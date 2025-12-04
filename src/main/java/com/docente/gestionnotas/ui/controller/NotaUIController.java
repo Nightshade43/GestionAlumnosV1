@@ -1,47 +1,45 @@
 package com.docente.gestionnotas.ui.controller;
 
 import com.docente.gestionnotas.model.Nota;
-import com.docente.gestionnotas.model.NucleoPedagogico;
-import com.docente.gestionnotas.service.CursoService;
 import com.docente.gestionnotas.service.NotaService;
-import com.docente.gestionnotas.service.NucleoPedagogicoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.NoSuchElementException;
 
+/**
+ * Controlador de UI para gestionar Notas.
+ * Maneja las operaciones de creación y eliminación de notas.
+ */
 @Controller
 @RequestMapping("/ui/notas")
 public class NotaUIController {
 
     private final NotaService notaService;
-    private final NucleoPedagogicoService nucleoService; // <-- Nuevo
-    private final CursoService cursoService; // <-- Nuevo (Para el redirect)
 
-    public NotaUIController(NotaService notaService, NucleoPedagogicoService nucleoService, CursoService cursoService) {
+    public NotaUIController(NotaService notaService) {
         this.notaService = notaService;
-        this.nucleoService = nucleoService;
-        this.cursoService = cursoService;
     }
 
-    // POST /ui/notas/guardar
+    /**
+     * Guarda una nueva nota en un núcleo pedagógico.
+     * POST /ui/notas/guardar
+     */
     @PostMapping("/guardar")
     public String guardarNota(
-            @RequestParam Long cursoId, // Recibido del campo oculto
-            @RequestParam Long nucleoId, // Recibido del campo oculto
+            @RequestParam Long cursoId,
+            @RequestParam Long nucleoId,
             Nota nota,
             RedirectAttributes redirectAttributes) {
 
-        // La URL de redirección final
         String redirectUrl = "redirect:/ui/cursos/" + cursoId + "/detalles";
 
         try {
-            // La lógica de negocio solo necesita la Nota y el ID del Núcleo
             notaService.agregarNotaANucleo(nucleoId, nota);
-
             redirectAttributes.addFlashAttribute("success", "Nota agregada exitosamente.");
             return redirectUrl;
 
@@ -49,28 +47,31 @@ public class NotaUIController {
             redirectAttributes.addFlashAttribute("error", "Error: El núcleo no existe.");
             return redirectUrl;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage()); // Muestra 'Nota debe estar entre 1 y 10'
+            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
             return redirectUrl;
         }
     }
 
-    // Controlador para ELIMINAR NÚCLEO
-    @PostMapping("/nucleos/eliminar/{nucleoId}")
-    public String eliminarNucleo(
-            @PathVariable Long nucleoId,
-            @RequestParam Long cursoId, // Captura el campo oculto
-            RedirectAttributes redirectAttributes) {
-        // ... lógica de eliminación con nucleoService.deleteById(nucleoId) ...
-        return "redirect:/ui/cursos/" + cursoId + "/detalles";
-    }
-
-    // Controlador para ELIMINAR NOTA
-    @PostMapping("/notas/eliminar/{notaId}")
+    /**
+     * Elimina una nota existente.
+     * POST /ui/notas/eliminar/{notaId}
+     */
+    @PostMapping("/eliminar/{notaId}")
     public String eliminarNota(
             @PathVariable Long notaId,
-            @RequestParam Long cursoId, // Captura el campo oculto
+            @RequestParam Long cursoId,
             RedirectAttributes redirectAttributes) {
-        // ... lógica de eliminación con notaService.deleteById(notaId) ...
+
+        try {
+            notaService.deleteById(notaId);
+            redirectAttributes.addFlashAttribute("success", "Nota eliminada exitosamente.");
+        } catch (NoSuchElementException e) {
+            redirectAttributes.addFlashAttribute("error", "Error: La nota no existe.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al eliminar la nota: " + e.getMessage());
+        }
+
         return "redirect:/ui/cursos/" + cursoId + "/detalles";
     }
 }

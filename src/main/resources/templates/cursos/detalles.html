@@ -8,29 +8,40 @@
 <body>
 <div class="container my-4">
 
-    <!-- CORRECCIÓN 1: nombreCompleto en lugar de nombre -->
+    <!-- CORRECCIÓN: nombreCompleto en lugar de nombre -->
     <h1 th:text="${curso.nombreCompleto}">Título del Curso</h1>
+
+    <!-- Información del curso usando campos existentes -->
     <div class="mb-3">
         <p><strong>Materia:</strong> <span th:text="${curso.nombreMateria}">Informática</span></p>
-        <p><strong>Año:</strong> <span th:text="${curso.anio}">1</span></p>
-        <p><strong>División:</strong> <span th:text="${curso.division}">A</span></p>
+        <p><strong>Año y División:</strong> <span th:text="${curso.anio} + 'º ' + ${curso.division}">1º A</span></p>
     </div>
 
-    <div th:if="${success}" class="alert alert-success" role="alert">
+    <!-- Mensajes de éxito y error -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
         <span th:text="${success}">Mensaje de éxito</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
-    <div th:if="${error}" class="alert alert-danger" role="alert">
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
         <span th:text="${error}">Mensaje de error</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
     <hr/>
 
-    <h2>Núcleos Pedagógicos</h2>
+    <!-- Encabezado de sección con botón para añadir núcleo -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Núcleos Pedagógicos</h2>
+        <a th:href="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}" class="btn btn-primary">
+            + Añadir Núcleo Pedagógico
+        </a>
+    </div>
 
+    <!-- Iteración sobre los núcleos -->
     <div th:each="nucleo : ${curso.nucleos}" class="card mb-3">
         <div class="card-header bg-light">
-            <!-- CORRECCIÓN 2: tema en lugar de nombre -->
-            <h4 class="d-inline-block mb-0" th:text="${nucleo.tema}">Nombre del Núcleo</h4>
+            <!-- CORRECCIÓN: tema en lugar de nombre -->
+            <h4 class="d-inline-block mb-0" th:text="${nucleo.tema}">Tema del Núcleo</h4>
 
             <form th:action="@{'/ui/nucleos/eliminar/' + ${nucleo.id}}" method="post" style="display: inline; margin-left: 15px;">
                 <input type="hidden" name="cursoId" th:value="${curso.id}" />
@@ -44,19 +55,30 @@
 
         <div class="card-body">
 
+            <!-- Mostrar descripción del núcleo si existe -->
+            <p th:if="${nucleo.descripcion != null and !nucleo.descripcion.isEmpty()}" class="text-muted">
+                <strong>Descripción:</strong> <span th:text="${nucleo.descripcion}">Descripción del núcleo</span>
+            </p>
+
+            <!-- Promedio del núcleo -->
             <p>
                 <strong>Promedio:</strong>
                 <span th:if="${promedios != null and promedios.get(nucleo.id) != null}"
-                      th:text="${#numbers.formatDecimal(promedios.get(nucleo.id), 0, 1)}">6.5</span>
-                <span th:unless="${promedios != null and promedios.get(nucleo.id) != null}">N/A</span>
+                      th:text="${#numbers.formatDecimal(promedios.get(nucleo.id), 1, 2)}"
+                      class="badge bg-info">6.5</span>
+                <span th:unless="${promedios != null and promedios.get(nucleo.id) != null}"
+                      class="badge bg-secondary">N/A</span>
             </p>
 
             <h5>Notas:</h5>
-            <ul class="list-group mb-3">
-                <li th:each="nota : ${nucleo.notas}" class="list-group-item d-flex justify-content-between align-items-center">
+
+            <!-- Lista de notas -->
+            <ul class="list-group mb-3" th:if="${nucleo.notas != null and !#lists.isEmpty(nucleo.notas)}">
+                <li th:each="nota : ${nucleo.notas}"
+                    class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
-                        <span th:text="${nota.valor}">5.0</span>
-                        (<span th:text="${nota.descripcion}">Examen</span>)
+                        <span class="badge bg-success me-2" th:text="${nota.valor}">5.0</span>
+                        <span th:text="${nota.descripcion}">Examen</span>
                     </div>
 
                     <form th:action="@{'/ui/notas/eliminar/' + ${nota.id}}" method="post" style="display: inline;">
@@ -70,38 +92,57 @@
                 </li>
             </ul>
 
+            <!-- Mensaje si no hay notas -->
+            <p th:if="${nucleo.notas == null or #lists.isEmpty(nucleo.notas)}" class="text-muted fst-italic">
+                No hay notas registradas en este núcleo.
+            </p>
+
+            <hr class="my-3"/>
+
             <h5>Añadir Nueva Nota</h5>
-            <form th:action="@{/ui/notas/guardar}" th:object="${nuevaNota}" method="post" class="row g-3 align-items-end">
+            <form th:action="@{/ui/notas/guardar}" th:object="${nuevaNota}" method="post"
+                  class="row g-3 align-items-end">
 
                 <input type="hidden" name="nucleoId" th:value="${nucleo.id}" />
                 <input type="hidden" name="cursoId" th:value="${curso.id}" />
 
                 <div class="col-md-3">
-                    <label for="valor" class="form-label">Valor</label>
-                    <input id="valor" type="number" th:field="*{valor}" placeholder="1-10" min="1" max="10" step="0.1" class="form-control" required />
+                    <label for="valor" class="form-label">Valor (1-10)</label>
+                    <input id="valor" type="number" th:field="*{valor}"
+                           placeholder="1-10" min="1" max="10" step="0.1"
+                           class="form-control" required />
                 </div>
 
                 <div class="col-md-5">
                     <label for="descripcion" class="form-label">Descripción</label>
-                    <input id="descripcion" type="text" th:field="*{descripcion}" placeholder="Examen Parcial / Taller" class="form-control" required />
+                    <input id="descripcion" type="text" th:field="*{descripcion}"
+                           placeholder="Examen Parcial / Taller"
+                           class="form-control" required />
                 </div>
 
                 <div class="col-md-4">
                     <button type="submit" class="btn btn-success w-100">Guardar Nota</button>
                 </div>
             </form>
+
+            <!-- Mensaje de error de validación -->
             <div th:if="${#fields.hasErrors('nuevaNota.*')}" class="alert alert-warning mt-2">
                 Hay errores en los datos de la nota.
             </div>
         </div>
     </div>
 
-    <div th:if="${#lists.isEmpty(curso.nucleos)}">
-        <p class="alert alert-info">Aún no hay núcleos pedagógicos definidos para este curso.</p>
+    <!-- Mensaje si no hay núcleos -->
+    <div th:if="${curso.nucleos == null or #lists.isEmpty(curso.nucleos)}">
+        <p class="alert alert-info">
+            Aún no hay núcleos pedagógicos definidos para este curso.
+            <a th:href="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}">Crear el primer núcleo</a>
+        </p>
     </div>
 
+    <!-- Botón de regreso -->
     <div class="mt-4">
-        <a th:href="@{/ui/cursos}" class="btn btn-secondary">Volver a la lista de cursos</a>
+        <a th:href="@{/ui/cursos}" class="btn btn-secondary">← Volver a la lista de cursos</a>
     </div>
 
 </div>

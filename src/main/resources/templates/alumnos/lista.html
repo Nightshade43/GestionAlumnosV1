@@ -3,42 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Alumnos</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1>Lista de Alumnos Registrados</h1>
-<a th:href="@{/ui/alumnos/crear}">Crear Nuevo Alumno</a>
+<div class="container my-4">
 
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre Completo</th>
-        <th>Email</th>
-        <th>Cursos Inscritos</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="alumno : ${alumnos}">
-        <td th:text="${alumno.id}">A-1234</td>
-        <td th:text="${alumno.nombre} + ' ' + ${alumno.apellido}">Juan Pérez</td>
-        <td th:text="${alumno.email}">jperez@mail.com</td>
-        <td>
-                    <span th:each="curso, iter : ${alumno.cursos}">
-                        <span th:text="${curso.nombreCompleto}">Informática I - 1º A</span>
-                        <span th:if="${!iter.last}">, </span>
+    <h1>Lista de Alumnos Registrados</h1>
+
+    <div class="mb-3">
+        <a th:href="@{/ui/alumnos/crear}" class="btn btn-primary">+ Crear Nuevo Alumno</a>
+        <a th:href="@{/ui/cursos}" class="btn btn-secondary">Ver Cursos</a>
+    </div>
+
+    <!-- Mensajes de éxito y error -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}">Mensaje de éxito</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}">Mensaje de error</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nombre Completo</th>
+            <th>Email</th>
+            <th>Cursos Inscritos</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="alumno : ${alumnos}">
+            <td th:text="${alumno.id}">A-1234</td>
+            <td th:text="${alumno.nombre} + ' ' + ${alumno.apellido}">Juan Pérez</td>
+            <td th:text="${alumno.email}">jperez@mail.com</td>
+
+            <!-- CORRECCIÓN: Manejo seguro de lista de cursos -->
+            <td>
+                    <span th:if="${alumno.cursos != null and !#lists.isEmpty(alumno.cursos)}">
+                        <span th:each="curso, iter : ${alumno.cursos}">
+                            <span th:text="${curso.nombreCompleto}">Informática I - 1º A</span>
+                            <span th:if="${!iter.last}">, </span>
+                        </span>
                     </span>
-        <td>
-            <a th:href="@{'/ui/alumnos/' + ${alumno.id} + '/editar'}">Editar</a> |
-            <form th:action="@{'/ui/alumnos/eliminar/' + ${alumno.id}}" method="post" style="display: inline;">
-                <button type="submit" onclick="return confirm('¿Eliminar alumno? Esto lo desinscribirá de todos los cursos.')" style="color: red;">
-                    Eliminar
-                </button>
-            </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+                <span th:if="${alumno.cursos == null or #lists.isEmpty(alumno.cursos)}"
+                      class="text-muted fst-italic">
+                        Sin cursos asignados
+                    </span>
+            </td>
+
+            <td>
+                <a th:href="@{'/ui/alumnos/' + ${alumno.id} + '/editar'}"
+                   class="btn btn-sm btn-outline-primary">
+                    Editar
+                </a>
+
+                <form th:action="@{'/ui/alumnos/eliminar/' + ${alumno.id}}"
+                      method="post"
+                      style="display: inline;">
+                    <button type="submit"
+                            onclick="return confirm('¿Eliminar alumno? Esto lo desinscribirá de todos los cursos.')"
+                            class="btn btn-sm btn-outline-danger">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+        <tbody th:if="${#lists.isEmpty(alumnos)}">
+        <tr>
+            <td colspan="5" class="text-center text-muted fst-italic">
+                No hay alumnos registrados.
+                <a th:href="@{/ui/alumnos/crear}">Crear el primer alumno</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
