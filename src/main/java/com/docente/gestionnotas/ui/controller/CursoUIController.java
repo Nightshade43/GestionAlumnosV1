@@ -7,8 +7,10 @@ import com.docente.gestionnotas.model.NucleoPedagogico;
 import com.docente.gestionnotas.service.AlumnoService;
 import com.docente.gestionnotas.service.CursoService;
 import com.docente.gestionnotas.service.NucleoPedagogicoService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -39,22 +41,17 @@ public class CursoUIController {
     }
 
     /**
-     * Lista todos los cursos.
-     * GET /ui/cursos
-     */
-    @GetMapping
-    public String listarCursos(Model model) {
-        model.addAttribute("cursos", cursoService.findAll());
-        return "cursos/lista";
-    }
-
-    /**
      * Muestra el formulario de creación de curso.
      * GET /ui/cursos/crear
      */
-    @GetMapping("/crear")
+// Dentro de @RequestMapping("/ui/cursos") en CursoUIController.java
+
+    @GetMapping("/crear") // Mapea a la URL /ui/cursos/crear
     public String mostrarFormularioCreacion(Model model) {
+        // Es CRÍTICO inyectar un objeto Curso vacío para que el formulario funcione
         model.addAttribute("curso", new Curso());
+
+        // Retorna el template que acabas de crear
         return "cursos/crear";
     }
 
@@ -62,22 +59,40 @@ public class CursoUIController {
      * Guarda un nuevo curso.
      * POST /ui/cursos
      */
-    @PostMapping
-    public String guardarCurso(Curso curso, Model model) {
-        try {
-            // MEJORA: Mover esta lógica al servicio o a un @PrePersist en la entidad
-            String nombreCompleto = curso.getNombreMateria() + " - " +
-                    curso.getAnio() + "º " + curso.getDivision();
-            curso.setNombreCompleto(nombreCompleto);
+    /**
+     * Procesa la solicitud POST del formulario de creación, valida y guarda el curso.
+     * (POST /ui/cursos/guardar)
+     */
+    @PostMapping("/guardar")
+    public String guardarCurso(@Valid @ModelAttribute("curso") Curso curso,
+                               BindingResult result,
+                               RedirectAttributes ra) {
 
+        // 1. Manejo de Errores de Validación (Revisa anotaciones en Curso.java)
+        if (result.hasErrors()) {
+            // Si hay errores de @NotBlank, @Min, etc., regresa a la vista para mostrarlos
+            return "cursos/crear";
+        }
+
+        try {
+            // 2. Ejecuta la lógica de negocio (guardar en la DB)
+            // El @PrePersist en Curso.java se encargará de generar el nombreCompleto
             cursoService.save(curso);
+
+            // 3. Redirección con Mensaje de Éxito
+            ra.addFlashAttribute("success",
+                    "Curso '" + curso.getNombreMateria() + " - " + curso.getDivision() + "' creado con éxito.");
+
+            // Redirige al listado principal de cursos (GET /ui/cursos)
             return "redirect:/ui/cursos";
 
         } catch (Exception e) {
-            model.addAttribute("error",
-                    "Error al guardar el curso. Verifique los datos. Detalle: " + e.getMessage());
-            model.addAttribute("curso", curso);
-            return "cursos/crear";
+            // Manejo de errores de base de datos o duplicados
+            // Redirigir de vuelta al formulario de creación para que el usuario pueda reintentar
+            ra.addFlashAttribute("error",
+                    "Error al guardar el curso: " + e.getMessage());
+
+            return "redirect:/ui/cursos/crear";
         }
     }
 
@@ -274,5 +289,16 @@ public class CursoUIController {
         }
 
         return promedios;
+    }
+
+    @GetMapping("") // O la URL que uses como inicio, ejemplo: "/"
+    public String listarCursos(Model model) {
+        // Asume que tienes un servicio para obtener todos los cursos
+        List<Curso> cursos = cursoService.findAll();
+
+        // El nombre del atributo debe coincidir con th:each="curso : ${cursos}"
+        model.addAttribute("cursos", cursos);
+
+        return "cursos/index"; // Retorna el template index.html (asumiendo que está en /templates/cursos/)
     }
 }

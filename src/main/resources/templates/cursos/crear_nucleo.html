@@ -3,27 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Añadir Núcleo Pedagógico</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1 th:text="'Añadir Núcleo a: ' + ${curso.nombreCompleto}">Añadir Núcleo a Curso</h1>
-<a th:href="@{/ui/cursos}">Volver a la Lista de Cursos</a>
 
-<p th:if="${error}" style="color: red;" th:text="${error}">[Mensaje de error]</p>
+<div class="container my-5">
 
-<form th:action="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}" th:object="${nucleo}" method="post">
+    <header class="mb-4">
+        <h1 class="display-6">📖 Crear Núcleo Pedagógico</h1>
+        <p class="lead text-muted" th:text="'Para: ' + ${curso.nombreCompleto}"></p>
+    </header>
 
-    <div>
-        <label for="tema">Tema Principal (Obligatorio):</label>
-        <input type="text" id="tema" th:field="*{tema}" required>
+    <hr class="mb-4">
+
+    <div th:if="${#fields.hasErrors('nucleo.*')}" class="alert alert-danger" role="alert">
+        <strong>Error de Validación:</strong> Por favor, corrige los siguientes problemas en el formulario.
+        <ul>
+            <li th:each="err : ${#fields.errors('nucleo.*')}" th:text="${err}">Error de validación</li>
+        </ul>
     </div>
 
-    <div>
-        <label for="descripcion">Descripción / Contenidos:</label>
-        <textarea id="descripcion" th:field="*{descripcion}" rows="5"></textarea>
-    </div>
+    <form th:action="@{'/ui/cursos/' + ${curso.id} + '/nucleos/crear'}"
+          th:object="${nucleo}"
+          method="post"
+          class="shadow-sm p-4 bg-white rounded">
 
-    <button type="submit">Guardar Núcleo Pedagógico</button>
+        <input type="hidden" name="cursoId" th:value="${curso.id}" />
 
-</form>
+        <div class="mb-3">
+            <label for="tema" class="form-label fw-bold">Tema Principal (Obligatorio)</label>
+            <input type="text" id="tema" th:field="*{tema}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('tema')}" th:errors="*{tema}" class="text-danger small mt-1">Error en Tema</div>
+        </div>
+
+        <div class="mb-4">
+            <label for="descripcion" class="form-label">Descripción / Contenidos</label>
+            <textarea id="descripcion" th:field="*{descripcion}" rows="5" class="form-control"></textarea>
+            <div th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-danger small mt-1">Error en Descripción</div>
+        </div>
+
+        <div class="d-flex justify-content-start">
+            <button type="submit" class="btn btn-success btn-lg me-2">Guardar Núcleo</button>
+            <a th:href="@{'/ui/cursos/' + ${curso.id}}" class="btn btn-secondary btn-lg">Cancelar y Volver al Curso</a>
+        </div>
+
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

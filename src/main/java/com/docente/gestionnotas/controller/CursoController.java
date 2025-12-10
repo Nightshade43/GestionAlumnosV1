@@ -46,7 +46,7 @@ public class CursoController {
     @PostMapping("/{cursoId}/nucleos")
     public ResponseEntity<Curso> addNucleoToCurso(@PathVariable Long cursoId, @RequestBody NucleoPedagogico nucleo) {
         try {
-            Curso cursoActualizado = nucleoService.agregarNucleoACurso(cursoId, nucleo);
+            Curso cursoActualizado = nucleoService.crearNucleo(cursoId, nucleo);
             return ResponseEntity.ok(cursoActualizado);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();

@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +17,22 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Curso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "El nombre completo es obligatorio")
     @Column(unique = true, nullable = false)
     private String nombreCompleto;
 
     @NotBlank(message = "El nombre de la materia es obligatorio")
     @Size(min = 2, max = 100, message = "El nombre de la materia debe tener entre 2 y 100 caracteres")
     private String nombreMateria;
+
+    private String descripcion;
 
     @Min(value = 1, message = "El año debe ser mayor a 0")
     private int anio;
@@ -85,5 +86,7 @@ public class Curso {
         if (nombreMateria != null && division != null) {
             this.nombreCompleto = nombreMateria + " - " + anio + "º " + division;
         }
+        this.descripcion = nombreCompleto;
     }
+
 }

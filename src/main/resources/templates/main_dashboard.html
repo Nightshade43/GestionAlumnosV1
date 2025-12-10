@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Control Docente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container my-5">
+    <header class="text-center mb-5">
+        <h1 class="display-3 fw-bold">Gestión de Notas y Alumnos</h1>
+        <p class="lead text-muted">Selecciona el área de gestión para comenzar.</p>
+    </header>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h2 class="card-title text-primary mb-3">🎓 Cursos y Notas</h2>
+                    <p class="card-text">
+                        Administra la lista de cursos, crea núcleos pedagógicos, y gestiona las notas de los alumnos.
+                    </p>
+                    <a th:href="@{/ui/cursos}" class="btn btn-primary btn-lg mt-3 w-75">
+                        Ir a Cursos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h2 class="card-title text-success mb-3">👥 Alumnos</h2>
+                    <p class="card-text">
+                        Gestiona la base de datos de alumnos, crea nuevos registros, y visualiza sus inscripciones a los cursos.
+                    </p>
+                    <a th:href="@{/ui/alumnos}" class="btn btn-success btn-lg mt-3 w-75">
+                        Ir a Alumnos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
