@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Detalles de Alumno: ' + ${alumno.nombre} + ' ' + ${alumno.apellido}">Detalles del Alumno</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container my-5">
+
+    <header class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <h1 class="display-5">👤 <span th:text="${alumno.nombre} + ' ' + ${alumno.apellido}">Nombre Completo</span></h1>
+        <div class="btn-group">
+            <a th:href="@{/ui/alumnos}" class="btn btn-secondary me-2">
+                ← Volver a Alumnos
+            </a>
+            <a th:href="@{'/ui/alumnos/' + ${alumno.id} + '/editar'}" class="btn btn-warning">
+                ✏️ Editar Alumno
+            </a>
+        </div>
+    </header>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}">Mensaje de éxito</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}">Mensaje de error</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <section class="mb-5 p-4 bg-light rounded shadow-sm">
+        <h2 class="h4 mb-3 text-primary">Información Personal</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>DNI/Identificación:</strong> <span th:text="${alumno.dni}">12345678</span></p>
+                <p><strong>Email:</strong> <span th:text="${alumno.email}">alumno@escuela.com</span></p>
+                <p><strong>Fecha Nacimiento:</strong>
+                    <span th:if="${alumno.fechaNacimiento}"
+                          th:text="${#temporals.format(alumno.fechaNacimiento, 'dd MMMM yyyy')}">10 Diciembre 2000</span>
+                    <span th:unless="${alumno.fechaNacimiento}" class="text-muted">No especificada</span>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>ID de Sistema:</strong> <span th:text="${alumno.id}">1</span></p>
+                <p><strong>Dirección:</strong>
+                    <span th:text="${alumno.direccion}">Calle Falsa 123</span>
+                    <span th:if="${!alumno.direccion}" class="text-muted">No especificada</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="h4 mb-3 text-primary">📚 Cursos Inscritos (<span th:text="${#lists.size(alumno.cursos)}">0</span>)</h2>
+
+        <div th:if="${#lists.isEmpty(alumno.cursos)}" class="alert alert-info">
+            Este alumno no está inscrito en ningún curso.
+        </div>
+
+        <table th:unless="${#lists.isEmpty(alumno.cursos)}" class="table table-hover shadow-sm bg-white rounded">
+            <thead class="table-primary">
+            <tr>
+                <th>ID Curso</th>
+                <th>Materia</th>
+                <th>Año y División</th>
+                <th>Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="curso : ${alumno.cursos}">
+                <td th:text="${curso.id}">1</td>
+                <td th:text="${curso.nombreMateria}">Informática I</td>
+                <td th:text="${curso.anio} + 'º ' + ${curso.division}">4º B</td>
+                <td>
+                    <a th:href="@{'/ui/cursos/' + ${curso.id}}" class="btn btn-sm btn-outline-primary">Ver Curso</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

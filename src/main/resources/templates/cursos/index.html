@@ -8,9 +8,22 @@
 <body>
 
 <div class="container my-5">
-    <header class="mb-4">
-        <h1 class="display-4">📚 Gestión de Cursos</h1>
-        <p class="lead">Bienvenido al panel de control docente. Selecciona un curso para gestionar alumnos y notas.</p>
+    <header class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5">📚 Gestión de Cursos</h1>
+        <div class="btn-group">
+
+            <a th:href="@{/}" class="btn btn-secondary me-2">
+                🏠 Inicio
+            </a>
+
+            <a th:href="@{/ui/alumnos}" class="btn btn-info me-2">
+                👤 Ir a Alumnos
+            </a>
+
+            <a th:href="@{/ui/cursos/crear}" class="btn btn-primary">
+                ➕ Crear Nuevo Curso
+            </a>
+        </div>
     </header>
 
     <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -23,12 +36,6 @@
     </div>
 
     <hr>
-
-    <div class="d-flex justify-content-end mb-4">
-        <a th:href="@{/ui/cursos/crear}" class="btn btn-primary btn-lg">
-            ➕ Crear Nuevo Curso
-        </a>
-    </div>
 
     <div th:if="${#lists.isEmpty(cursos)}" class="alert alert-info" role="alert">
         Aún no hay cursos registrados. ¡Comienza creando uno!

@@ -2,12 +2,11 @@ package com.docente.gestionnotas.ui.controller;
 
 import com.docente.gestionnotas.model.Alumno;
 import com.docente.gestionnotas.service.AlumnoService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -44,23 +43,40 @@ public class AlumnoUIController {
         return "alumnos/crear";
     }
 
-    // POST /ui/alumnos: Procesa el formulario y guarda
-    @PostMapping
-    public String guardarAlumno(Alumno alumno, Model model) {
+
+    /**
+     * Procesa la solicitud POST para guardar un nuevo Alumno.
+     * Mapea a POST /ui/alumnos/guardar
+     */
+    @PostMapping("/guardar")
+    public String guardarAlumno(@Valid @ModelAttribute("alumno") Alumno alumno,
+                                BindingResult result,
+                                RedirectAttributes ra) {
+
+        // 1. Manejo de Errores de Validación (Si el usuario olvidó un campo @NotBlank)
+        if (result.hasErrors()) {
+            // Vuelve al formulario para mostrar errores
+            return "alumnos/crear";
+        }
+
         try {
-            // 1. Llama al servicio para guardar la entidad
+            // 2. Lógica de Negocio: Guardar el objeto Alumno
             alumnoService.save(alumno);
 
-            // 2. Redirecciona a la lista de alumnos
-            // "redirect:..." genera una nueva petición GET a la URL especificada.
+            // 3. Redirección con Mensaje de Éxito
+            ra.addFlashAttribute("success",
+                    "Alumno '" + alumno.getNombre() + " " + alumno.getApellido() + "' registrado con éxito.");
+
+            // Redirige al listado principal de alumnos
             return "redirect:/ui/alumnos";
 
         } catch (Exception e) {
-            // Manejo básico de errores (ej. ID duplicado o campo nulo)
-            model.addAttribute("error", "Error al guardar el alumno: " + e.getMessage());
-            // Si hay un error, vuelve a la vista de creación manteniendo los datos
-            model.addAttribute("alumno", alumno);
-            return "alumnos/crear";
+            // Manejo de errores de DNI/Email duplicado, etc.
+            ra.addFlashAttribute("error",
+                    "Error al registrar el alumno: " + e.getMessage());
+
+            // Si hay un error, redirigir al formulario para que el usuario pueda reintentar
+            return "redirect:/ui/alumnos/crear";
         }
     }
 
@@ -74,5 +90,30 @@ public class AlumnoUIController {
             redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
         }
         return "redirect:/ui/alumnos"; // Redireccionar a la lista de alumnos
+    }
+
+    /**
+     * Muestra los detalles de un Alumno específico, incluyendo sus cursos inscritos.
+     * GET /ui/alumnos/{id}
+     */
+    @GetMapping("/{id}")
+    public String mostrarDetallesAlumno(@PathVariable Long id, Model model, RedirectAttributes ra) {
+        try {
+            // 1. Buscar el alumno por ID (asumiendo que AlumnoService tiene findById)
+            Alumno alumno = alumnoService.findById(id);
+
+            // 2. Pasar el alumno al modelo (con su lista de cursos cargada por defecto)
+            model.addAttribute("alumno", alumno);
+
+            // Necesitas asegurarte de que tu clase Alumno esté anotada con @Entity
+            // y que la relación @ManyToMany con Curso esté configurada correctamente.
+
+            return "alumnos/detalles";
+
+        } catch (NoSuchElementException e) {
+            // Si el ID es inválido, redirige a la lista con un error
+            ra.addFlashAttribute("error", "Error: El alumno con ID " + id + " no fue encontrado.");
+            return "redirect:/ui/alumnos";
+        }
     }
 }

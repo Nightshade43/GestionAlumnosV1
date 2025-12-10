@@ -26,7 +26,7 @@ public class AlumnoController {
 
     // GET /api/alumnos/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Alumno> getAlumnoById(@PathVariable String id) {
+    public ResponseEntity<Alumno> getAlumnoById(@PathVariable Long id) {
         try {
             Alumno alumno = alumnoService.findById(id);
             return ResponseEntity.ok(alumno);

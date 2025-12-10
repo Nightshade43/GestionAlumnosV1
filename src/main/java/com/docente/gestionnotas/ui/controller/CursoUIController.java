@@ -213,7 +213,7 @@ public class CursoUIController {
     @PostMapping("/{id}/inscribir")
     public String inscribirAlumno(
             @PathVariable Long id,
-            @RequestParam String alumnoId,
+            @RequestParam Long alumnoId,
             RedirectAttributes redirectAttributes) {
 
         String redirectUrl = "redirect:/ui/cursos/" + id + "/detalles";
@@ -236,7 +236,7 @@ public class CursoUIController {
     @PostMapping("/{cursoId}/desinscribir")
     public String desinscribirAlumno(
             @PathVariable Long cursoId,
-            @RequestParam String alumnoId,
+            @RequestParam Long alumnoId,
             RedirectAttributes redirectAttributes) {
 
         String redirectUrl = "redirect:/ui/cursos/" + cursoId + "/detalles";

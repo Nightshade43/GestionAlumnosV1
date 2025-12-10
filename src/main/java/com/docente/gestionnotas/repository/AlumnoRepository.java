@@ -12,4 +12,6 @@ public interface AlumnoRepository extends JpaRepository<Alumno, String> {
     // Ejemplo de método de búsqueda personalizado
     // Spring Data genera automáticamente la consulta: SELECT a FROM Alumno a WHERE a.apellido = ?1
     List<Alumno> findByApellido(String apellido);
+
+    Alumno findById(Long id);
 }

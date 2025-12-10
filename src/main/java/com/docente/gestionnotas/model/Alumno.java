@@ -1,14 +1,15 @@
 package com.docente.gestionnotas.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,10 +23,8 @@ import java.util.List;
 public class Alumno {
 
     @Id
-    @NotBlank(message = "El ID es obligatorio")
-    @Size(max = 50, message = "El ID no puede exceder 50 caracteres")
-    @Column(nullable = false, unique = true)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Esta línea es CRÍTICA
+    private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
@@ -41,6 +40,16 @@ public class Alumno {
     @Size(max = 150, message = "El email no puede exceder 150 caracteres")
     private String email;
 
+    @NotBlank(message = "El DNI es obligatorio")
+    @Size(min = 7, max = 10, message = "El DNI debe tener entre 7 y 10 caracteres")
+    private String dni;
+
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    private LocalDate fechaNacimiento;
+
+    @Size(max = 150, message = "La direccion no puede exceder 150 caracteres")
+    private String direccion;
+
     // Relación Muchos a Muchos: Un alumno está en múltiples cursos
     @ManyToMany
     @JoinTable(
@@ -49,35 +58,6 @@ public class Alumno {
             inverseJoinColumns = @JoinColumn(name = "curso_id")
     )
     private List<Curso> cursos = new ArrayList<>();
-
-    /**
-     * Añade un curso a la lista de cursos del alumno.
-     * Mantiene la bidireccionalidad de la relación.
-     */
-    public void addCurso(Curso curso) {
-        if (cursos == null) {
-            cursos = new ArrayList<>();
-        }
-        if (!cursos.contains(curso)) {
-            cursos.add(curso);
-            if (!curso.getAlumnos().contains(this)) {
-                curso.getAlumnos().add(this);
-            }
-        }
-    }
-
-    /**
-     * Remueve un curso de la lista de cursos del alumno.
-     * Mantiene la bidireccionalidad de la relación.
-     */
-    public void removeCurso(Curso curso) {
-        if (cursos != null) {
-            cursos.remove(curso);
-            if (curso.getAlumnos().contains(this)) {
-                curso.getAlumnos().remove(this);
-            }
-        }
-    }
 
     /**
      * Obtiene el nombre completo del alumno.
