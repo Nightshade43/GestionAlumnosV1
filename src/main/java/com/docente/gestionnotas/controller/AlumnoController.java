@@ -48,7 +48,7 @@ public class AlumnoController {
 
     // POST /api/alumnos/{alumnoId}/inscribir/{cursoId}
     @PostMapping("/{alumnoId}/inscribir/{cursoId}")
-    public ResponseEntity<Alumno> inscribirAlumno(@PathVariable String alumnoId, @PathVariable Long cursoId) {
+    public ResponseEntity<Alumno> inscribirAlumno(@PathVariable long alumnoId, @PathVariable Long cursoId) {
         try {
             Alumno alumnoActualizado = alumnoService.inscribirAlumnoACurso(alumnoId, cursoId);
             return ResponseEntity.ok(alumnoActualizado);

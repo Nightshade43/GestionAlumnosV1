@@ -26,18 +26,14 @@ public class AlumnoService {
 
     @Transactional(readOnly = true)
     public List<Alumno> findAll() {
-        return alumnoRepository.findAll();
+        return alumnoRepository.findAll().stream()
+                .filter(java.util.Objects::nonNull) // Filtra cualquier elemento null
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public Alumno findById(Long id) {
-        Optional<Alumno> optionalAlumno = alumnoRepository.findById(id);
-
-        if (optionalAlumno.isEmpty()) { // o isPresent() si usas una versión anterior a Java 11
-            throw new NoSuchElementException("Alumno con ID " + id + " no encontrado.");
-        }
-
-        return optionalAlumno.get();
+        return alumnoRepository.findById(id);
     }
 
     @Transactional
@@ -108,12 +104,46 @@ public class AlumnoService {
     }
 
     @Transactional
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         if (!alumnoRepository.existsById(id)) {
             throw new NoSuchElementException("Alumno con ID " + id + " no encontrado.");
         }
         // Debido a que 'Alumno' es la entidad dueña de la relación M:M,
         // al eliminar el alumno, las entradas correspondientes en 'alumno_curso' se eliminan.
         alumnoRepository.deleteById(id);
+    }
+
+
+    // Dentro de AlumnoService.java
+
+    /**
+     * Matrícula un alumno a un curso específico, verificando duplicados.
+     */
+    @Transactional
+    public void matricular(Long alumnoId, Long cursoId) {
+        // 1. Verificar si el Alumno existe (usando el findById corregido)
+        Alumno alumno = findById(alumnoId);
+
+        // 2. Verificar si el Curso existe
+        Curso curso = cursoRepository.findById(cursoId)
+                .orElseThrow(() -> new NoSuchElementException("Curso con ID " + cursoId + " no encontrado."));
+
+        // 3. Validación de Negocio: Verificar si ya está matriculado
+        boolean yaInscrito = alumno.getCursos().stream()
+                .anyMatch(c -> c.getId().equals(cursoId));
+
+        if (yaInscrito) {
+            throw new IllegalArgumentException("El alumno ya se encuentra matriculado en este curso.");
+        }
+
+        // 4. Establecer la relación (Alumno es la entidad 'dueña')
+        alumno.getCursos().add(curso);
+
+        // 5. Persistir el cambio
+        alumnoRepository.save(alumno);
+
+        // Opcional: Si quieres mantener la bidireccionalidad en el lado de Curso (si es necesario)
+        curso.getAlumnos().add(alumno);
+        cursoRepository.save(curso);
     }
 }

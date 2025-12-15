@@ -1,7 +1,9 @@
 package com.docente.gestionnotas.ui.controller;
 
 import com.docente.gestionnotas.model.Alumno;
+import com.docente.gestionnotas.model.Curso;
 import com.docente.gestionnotas.service.AlumnoService;
+import com.docente.gestionnotas.service.CursoService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,9 +19,11 @@ import java.util.NoSuchElementException;
 public class AlumnoUIController {
 
     private final AlumnoService alumnoService;
+    private final CursoService cursoService;
 
-    public AlumnoUIController(AlumnoService alumnoService) {
+    public AlumnoUIController(AlumnoService alumnoService, CursoService cursoService) {
         this.alumnoService = alumnoService;
+        this.cursoService = cursoService;
     }
 
     // Ruta: /ui/alumnos
@@ -82,7 +86,7 @@ public class AlumnoUIController {
 
     // NUEVO MÉTODO: POST para eliminar un Alumno
     @PostMapping("/eliminar/{id}")
-    public String eliminarAlumno(@PathVariable String id, RedirectAttributes redirectAttributes) {
+    public String eliminarAlumno(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             alumnoService.deleteById(id);
             redirectAttributes.addFlashAttribute("success", "Alumno eliminado exitosamente.");
@@ -105,6 +109,10 @@ public class AlumnoUIController {
             // 2. Pasar el alumno al modelo (con su lista de cursos cargada por defecto)
             model.addAttribute("alumno", alumno);
 
+            // 3. Muestra listado de cursos
+            List<Curso> cursosDisponibles = cursoService.findAll(); // ASUMO que tienes un CursoService
+            model.addAttribute("cursosDisponibles", cursosDisponibles);
+
             // Necesitas asegurarte de que tu clase Alumno esté anotada con @Entity
             // y que la relación @ManyToMany con Curso esté configurada correctamente.
 
@@ -114,6 +122,61 @@ public class AlumnoUIController {
             // Si el ID es inválido, redirige a la lista con un error
             ra.addFlashAttribute("error", "Error: El alumno con ID " + id + " no fue encontrado.");
             return "redirect:/ui/alumnos";
+        }
+    }
+
+    /**
+            * Muestra el formulario precargado para editar un alumno.
+            * Mapea a GET /ui/alumnos/{id}/editar
+     **/
+    @GetMapping("/{id}/editar")
+    public String mostrarFormularioEdicion(@PathVariable Long id, Model model, RedirectAttributes ra) {
+        try {
+            // Usamos el findById que ya corregimos
+            Alumno alumno = alumnoService.findById(id);
+            model.addAttribute("alumno", alumno);
+
+            // Usaremos la misma plantilla de creación para la edición
+            return "alumnos/crear";
+
+        } catch (NoSuchElementException e) {
+            ra.addFlashAttribute("error", "El alumno a editar no fue encontrado.");
+            return "redirect:/ui/alumnos";
+        }
+    }
+
+    // Dentro de AlumnoUIController.java
+
+    /**
+     * Procesa la matriculación de un alumno a un curso específico.
+     * Mapea a POST /ui/alumnos/matricular
+     */
+    @PostMapping("/matricular")
+    public String matricularAlumnoACurso(@RequestParam Long alumnoId,
+                                         @RequestParam Long cursoId,
+                                         RedirectAttributes ra) {
+        try {
+            // 1. Delegar la lógica de negocio al servicio
+            alumnoService.matricular(alumnoId, cursoId);
+
+            ra.addFlashAttribute("success", "El alumno fue matriculado con éxito al curso.");
+
+            // 2. Redirigir a la vista de detalles del alumno
+            return "redirect:/ui/alumnos/" + alumnoId;
+
+        } catch (NoSuchElementException e) {
+            // Alumno o Curso no encontrado
+            ra.addFlashAttribute("error", "Error de matriculación: " + e.getMessage());
+            return "redirect:/ui/alumnos/" + alumnoId;
+
+        } catch (IllegalArgumentException e) {
+            // Error de negocio: Ya está inscrito
+            ra.addFlashAttribute("error", "Error de matriculación: " + e.getMessage());
+            return "redirect:/ui/alumnos/" + alumnoId;
+
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Error inesperado al matricular: " + e.getMessage());
+            return "redirect:/ui/alumnos/" + alumnoId;
         }
     }
 }

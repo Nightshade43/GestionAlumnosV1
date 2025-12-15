@@ -46,15 +46,20 @@
                 <p><strong>ID de Sistema:</strong> <span th:text="${alumno.id}">1</span></p>
                 <p><strong>Dirección:</strong>
                     <span th:text="${alumno.direccion}">Calle Falsa 123</span>
-                    <span th:if="${!alumno.direccion}" class="text-muted">No especificada</span>
+                    <span th:if="${#strings.isEmpty(alumno.direccion)}" class="text-muted">No especificada</span>
                 </p>
             </div>
         </div>
     </section>
 
-    <section>
-        <h2 class="h4 mb-3 text-primary">📚 Cursos Inscritos (<span th:text="${#lists.size(alumno.cursos)}">0</span>)</h2>
-
+        <section>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 mb-0 text-primary">📚 Cursos Inscritos (<span th:text="${#lists.size(alumno.cursos)}">0</span>)</h2>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalMatriculacion">
+                    ➕ Matricular a Curso
+                </button>
+            </div>
+        </section>
         <div th:if="${#lists.isEmpty(alumno.cursos)}" class="alert alert-info">
             Este alumno no está inscrito en ningún curso.
         </div>
@@ -80,7 +85,41 @@
             </tbody>
         </table>
     </section>
+</div>
 
+<div class="modal fade" id="modalMatriculacion" tabindex="-1" aria-labelledby="matricularLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="matricularLabel">Matricular Alumno a un Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/ui/alumnos/matricular}" method="post">
+                <div class="modal-body">
+                    <p>Selecciona el curso al que deseas inscribir a <strong th:text="${alumno.nombre} + ' ' + ${alumno.apellido}"></strong>.</p>
+
+                    <input type="hidden" name="alumnoId" th:value="${alumno.id}">
+
+                    <div class="mb-3">
+                        <label for="cursoId" class="form-label">Curso Disponible</label>
+                        <select id="cursoId" name="cursoId" class="form-select" required>
+                            <option value="">-- Selecciona un curso --</option>
+
+                            <option th:each="curso : ${cursosDisponibles}"
+                                    th:value="${curso.id}"
+                                    th:text="${curso.nombreMateria} + ' (' + ${curso.anio} + 'º ' + ${curso.division} + ')'">
+                                Matemática 4º B
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Confirmar Matrícula</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

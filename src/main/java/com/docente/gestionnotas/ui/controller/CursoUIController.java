@@ -100,29 +100,23 @@ public class CursoUIController {
      * Muestra los detalles de un curso específico.
      * GET /ui/cursos/{cursoId}/detalles
      */
-    @GetMapping("/{cursoId}/detalles")
-    public String mostrarDetallesCurso(
-            @PathVariable Long cursoId,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-
+    @GetMapping("/{id}")
+    public String mostrarDetallesCurso(@PathVariable Long id, Model model) {
         try {
-            Curso curso = cursoService.findById(cursoId);
+            // Llama al servicio para obtener el curso
+            Curso curso = cursoService.findById(id);
 
-            // Inyectar el curso
+            // Añade el objeto 'curso' al modelo para que Thymeleaf lo use
             model.addAttribute("curso", curso);
 
-            // Inyectar promedios (puede mejorarse con lógica real de cálculo)
-            Map<Long, Double> promedios = calcularPromedios(curso);
-            model.addAttribute("promedios", promedios);
-
-            // Inyectar objeto para el formulario de nueva nota
-            model.addAttribute("nuevaNota", new Nota());
-
+            // Retorna la plantilla Thymeleaf (debe existir el archivo 'cursos/detalles.html')
             return "cursos/detalles";
 
         } catch (NoSuchElementException e) {
-            redirectAttributes.addFlashAttribute("error", "Error: Curso no encontrado.");
+            // Manejo de error si el curso no existe
+            // Redirige a la lista de cursos con un mensaje de error
+            // Asume que la lista de cursos está mapeada a /ui/cursos
+            model.addAttribute("error", "Curso con ID " + id + " no encontrado.");
             return "redirect:/ui/cursos";
         }
     }

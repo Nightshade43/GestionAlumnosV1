@@ -26,7 +26,6 @@
     </header>
 
     <h1>Lista de Alumnos Registrados</h1>
-    <!-- Mensajes de éxito y error -->
     <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
         <span th:text="${success}">Mensaje de éxito</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -47,12 +46,11 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="alumno : ${alumnos}">
+        <tr th:each="alumno : ${alumnos}" th:if="${alumno != null}">
             <td th:text="${alumno.dni}">A-1234</td>
             <td th:text="${alumno.nombre} + ' ' + ${alumno.apellido}">Juan Pérez</td>
             <td th:text="${alumno.email}">jperez@mail.com</td>
 
-            <!-- CORRECCIÓN: Manejo seguro de lista de cursos -->
             <td>
                     <span th:if="${alumno.cursos != null and !#lists.isEmpty(alumno.cursos)}">
                         <span th:each="curso, iter : ${alumno.cursos}">
@@ -67,8 +65,20 @@
             </td>
 
             <td>
+                <a th:href="@{'/ui/alumnos/' + ${alumno.id}}"
+                   class="btn btn-sm btn-info me-2"
+                   title="Ver Información y Cursos Inscritos">
+                    🔍 Detalles
+                </a>
+
+                <a th:href="@{'/ui/alumnos/' + ${alumno.id}}"
+                   class="btn btn-sm btn-success me-2"
+                   title="Inscribir a un Curso">
+                    ➕ Inscribir
+                </a>
+
                 <a th:href="@{'/ui/alumnos/' + ${alumno.id} + '/editar'}"
-                   class="btn btn-sm btn-outline-primary">
+                   class="btn btn-sm btn-outline-primary me-2">
                     Editar
                 </a>
 

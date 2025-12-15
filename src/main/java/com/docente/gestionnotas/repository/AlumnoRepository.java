@@ -14,4 +14,8 @@ public interface AlumnoRepository extends JpaRepository<Alumno, String> {
     List<Alumno> findByApellido(String apellido);
 
     Alumno findById(Long id);
+
+    boolean existsById(Long id);
+
+    void deleteById(Long id);
 }

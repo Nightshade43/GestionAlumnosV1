@@ -29,11 +29,10 @@ public class CursoService {
 
     @Transactional(readOnly = true)
     public Curso findById(Long id) {
-        // Usamos orElseThrow para lanzar una excepción si el Optional está vacío
         return cursoRepository.findById(id)
-                .orElseThrow(() -> new java.util.NoSuchElementException("Curso no encontrado con ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Curso con ID " + id + " no encontrado."));
     }
-
+    
     @Transactional(readOnly = true)
     public List<Curso> findAll() {
         return cursoRepository.findAll();
