@@ -32,7 +32,7 @@ public class CursoService {
         return cursoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Curso con ID " + id + " no encontrado."));
     }
-    
+
     @Transactional(readOnly = true)
     public List<Curso> findAll() {
         return cursoRepository.findAll();
